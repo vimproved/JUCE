@@ -49,7 +49,9 @@
 #include <juce_audio_plugin_client/juce_audio_plugin_client.h>
 #include <juce_audio_plugin_client/detail/juce_CheckSettingMacros.h>
 #include <juce_audio_plugin_client/detail/juce_PluginUtilities.h>
-#include <juce_audio_plugin_client/detail/juce_LinuxMessageThread.h>
+#if ! JUCE_AUDIOPROCESSOR_NO_GUI
+ #include <juce_audio_plugin_client/detail/juce_LinuxMessageThread.h>
+#endif
 
 #include <juce_audio_processors/utilities/juce_FlagCache.h>
 #include <juce_audio_processors/format_types/juce_LegacyAudioParameter.cpp>
@@ -737,6 +739,7 @@ public:
         return LV2_STATE_SUCCESS;
     }
 
+   #if ! JUCE_AUDIOPROCESSOR_NO_GUI
     std::unique_ptr<AudioProcessorEditor> createEditor()
     {
         return std::unique_ptr<AudioProcessorEditor> (processor->createEditorIfNeeded());
@@ -746,6 +749,7 @@ public:
     {
         processor->editorBeingDeleted (editor);
     }
+   #endif
 
     static std::unique_ptr<AudioProcessor> createProcessorInstance()
     {
@@ -803,7 +807,7 @@ private:
 
     ScopedJuceInitialiser_GUI scopedJuceInitialiser;
 
-   #if JUCE_LINUX || JUCE_BSD
+   #if (JUCE_LINUX || JUCE_BSD) && ! JUCE_AUDIOPROCESSOR_NO_GUI
     SharedResourcePointer<detail::MessageThread> messageThread;
    #endif
 
@@ -902,6 +906,7 @@ private:
               "\tlv2:binary <" << URL::addEscapeChars (libraryPath.getFileName(), false) << "> ;\n"
               "\trdfs:seeAlso <dsp.ttl> .\n";
 
+       #if ! JUCE_AUDIOPROCESSOR_NO_GUI
         if (proc.hasEditor())
         {
            #if JUCE_MAC
@@ -921,6 +926,7 @@ private:
                   "\trdfs:seeAlso <ui.ttl> .\n"
                   "\n";
         }
+       #endif
 
         for (auto i = 0, end = proc.getNumPrograms(); i < end; ++i)
         {
@@ -1153,8 +1159,10 @@ private:
 
         os << "<" JucePlugin_LV2URI ">\n";
 
+       #if ! JUCE_AUDIOPROCESSOR_NO_GUI
         if (proc.hasEditor())
             os << "\tui:ui <" << JucePluginLV2UriUi << "> ;\n";
+       #endif
 
         const auto versionParts = StringArray::fromTokens (JucePlugin_VersionString, ".", "");
 
@@ -1358,6 +1366,7 @@ private:
 
     static Result writeUiTtl (AudioProcessor& proc, const File& libraryPath)
     {
+       #if ! JUCE_AUDIOPROCESSOR_NO_GUI
         if (! proc.hasEditor())
             return Result::ok();
 
@@ -1399,6 +1408,7 @@ private:
               "\topts:supportedOption\n"
               "\t\tui:scaleFactor ,\n"
               "\t\tparam:sampleRate .\n";
+       #endif
 
         return Result::ok();
     }
@@ -1525,6 +1535,7 @@ static Optional<float> findScaleFactor (const LV2_URID_Map* symap, const LV2_Opt
     return parser.parseNumericOption<float> (scaleFactorOption);
 }
 
+#if ! JUCE_AUDIOPROCESSOR_NO_GUI
 class LV2UIInstance final : private Component,
                             private ComponentListener
 {
@@ -1837,6 +1848,7 @@ LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor (uint32_t index)
 
     return &descriptor;
 }
+#endif
 
 } // namespace juce::lv2_client
 

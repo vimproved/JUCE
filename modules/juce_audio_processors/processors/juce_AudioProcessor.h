@@ -968,6 +968,7 @@ public:
     */
     virtual void setNonRealtime (bool isNonRealtime) noexcept;
 
+   #if ! JUCE_AUDIOPROCESSOR_NO_GUI
     //==============================================================================
     /** Creates the processor's GUI.
 
@@ -1017,6 +1018,7 @@ public:
         This may call createEditor() internally to create the component.
     */
     AudioProcessorEditor* createEditorIfNeeded();
+   #endif
 
     //==============================================================================
     /** Returns the default number of steps for a parameter.
@@ -1250,9 +1252,11 @@ public:
 
     virtual CurveData getResponseCurve (CurveData::Type /*curveType*/) const      { return {}; }
 
+   #if ! JUCE_AUDIOPROCESSOR_NO_GUI
     //==============================================================================
     /** Not for public use - this is called before deleting an editor component. */
     void editorBeingDeleted (AudioProcessorEditor*) noexcept;
+   #endif
 
     /** Flags to indicate the type of plugin context in which a processor is being used. */
     enum WrapperType
@@ -1282,7 +1286,9 @@ public:
     struct TrackProperties
     {
         String name;    // The name of the track - this will be empty if the track name is not known
+       #if ! JUCE_AUDIOPROCESSOR_NO_GUI
         Colour colour;  // The colour of the track - this will be transparentBlack if the colour is not known
+       #endif
 
         // other properties may be added in the future
     };
@@ -1531,7 +1537,9 @@ private:
 
     //==============================================================================
     Array<AudioProcessorListener*> listeners;
+   #if ! JUCE_AUDIOPROCESSOR_NO_GUI
     Component::SafePointer<AudioProcessorEditor> activeEditor;
+   #endif
     double currentSampleRate = 0;
     int blockSize = 0, latencySamples = 0;
     bool suspended = false;
