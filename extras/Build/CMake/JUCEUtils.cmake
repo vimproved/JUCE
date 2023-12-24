@@ -1464,6 +1464,9 @@ function(_juce_configure_plugin_targets target)
 
     if((VST IN_LIST active_formats) AND (NOT TARGET juce_vst2_sdk))
         message(FATAL_ERROR "Use juce_set_vst2_sdk_path to set up the VST sdk before adding VST targets")
+
+    if((AAX IN_LIST active_formats) AND (NOT TARGET juce_aax_sdk))
+        message(FATAL_ERROR "Use juce_set_aax_sdk_path to set up the AAX sdk before adding AAX targets")
     endif()
 
     _juce_add_standard_defs(${target})
