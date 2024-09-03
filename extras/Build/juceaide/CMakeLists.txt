@@ -154,7 +154,7 @@ else()
 
     add_executable(juce::juceaide ALIAS juceaide)
 
-    set(JUCE_TOOL_INSTALL_DIR "bin/JUCE-${JUCE_VERSION}" CACHE STRING
+    set(JUCE_TOOL_INSTALL_DIR "lib/JUCE-${JUCE_VERSION}" CACHE STRING
         "The location, relative to the install prefix, where juceaide will be installed")
 
     install(PROGRAMS "${imported_location}" DESTINATION "${JUCE_TOOL_INSTALL_DIR}")
